@@ -1,3 +1,5 @@
+
+
 import json
 import math
 import os
@@ -75,6 +77,7 @@ def configure_w2v2_for_training(pretrained_model, output_dir, use_target_vocab, 
         model_ = Wav2Vec2ForCTC.from_pretrained(pretrained_model_name_or_path=pretrained_model,
                                                 pad_token_id=pad_token_id,
                                                 vocab_size=len(w2v2_processor.tokenizer),
+						ignore_mismatched_sizes=True,
                                                 **model_kwargs)
     else:
         model_ = Wav2Vec2ForCTC.from_pretrained(pretrained_model_name_or_path=pretrained_model, **model_kwargs)
@@ -158,8 +161,7 @@ def main(pretrained_model, output_dir, train_tsv, eval_tsv, use_target_vocab, hf
                    "model_kwargs": {"mask_time_prob": 0, "gradient_checkpointing": True, "ctc_loss_reduction": "mean"}}
 
     dataset, vocab_dict = preprocess_text(dataset)
-    model, processor = configure_w2v2_for_training(pretrained_model, output_dir, use_target_vocab, vocab_dict,
-                                                   w2v2_config)
+    model, processor = configure_w2v2_for_training(pretrained_model, output_dir, use_target_vocab, vocab_dict, w2v2_config)
 
     # lm_arpa is not None:
     #     processor = configure_lm(processor, args.lm_arpa, output_dir)
@@ -224,8 +226,3 @@ if __name__ == '__main__':
          eval_tsv='./data/wav_split_gold/eval.tsv',
          use_target_vocab=True,
          hft_logging=40)
-
-
-
-
-
